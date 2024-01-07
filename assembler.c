@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-
+#include <stdbool.h>
 
 #include "Parser.h"
 #include "SymbolTable.h"
-
 
 SymbolTable MyST;
 Parser MyParser;
@@ -76,20 +75,35 @@ int main(int argc, char const *argv[]) {
         printf("\t======\tFirst-pass\t======\t\n");
         rewind(fOut);
 
-        while (fgets(line, sizeof(line), fOut)) {
-            printf("%s", line);
+        // while (fgets(line, sizeof(line), fOut)) {
+        //     printf("%s", line);
 
-            char *idx_L = strchr(line, '(');
-            char *idx_R = strchr(line, ')');
-            if (idx_L != NULL && idx_R != NULL) {
-                *idx_R = '\0';
-                strcpy(line, idx_L + 1);
-                MyST.addLabel(line);
-                continue;
-            } else {
-                MyST.incLabelCounter();
-            }
-        }
+        //     char *idx_L = strchr(line, '(');
+        //     char *idx_R = strchr(line, ')');
+        //     if (idx_L != NULL && idx_R != NULL) {
+        //         *idx_R = '\0';
+        //         strcpy(line, idx_L + 1);
+        //         MyST.addLabel(line);
+        //         continue;
+        //     } else {
+        //         MyST.incLabelCounter();
+        //     }
+        // }
+        while (fgets(line, sizeof(line), fOut)) {
+    printf("%s", line);
+
+    char *idx_L = strchr(line, '(');
+    char *idx_R = strchr(line, ')');
+    if (idx_L != NULL && idx_R != NULL) {
+        *idx_R = '\0';
+        strcpy(line, idx_L + 1);
+        addLabel(&MyST, line); // Corrected function call
+        continue;
+    } else {
+        incLabelCounter(&MyST); // Assuming this is also a function and not a method
+    }
+}
+
 
         printf("\t======\tSecond-pass\t======\t\n");
         rewind(fOut);
@@ -97,7 +111,10 @@ int main(int argc, char const *argv[]) {
         while (fgets(line, sizeof(line), fOut)) {
             printf("%s", line);
 
-            strcpy(macCode, MyParser.parseInst(line));
+            // Fixed function call
+            //strcpy(macCode, MyParser.parseInst(&MyParser, line));
+            strcpy(macCode, parseInst(&MyParser, line));
+
             printf("%s\t->\t%s\n", line, macCode);
             fprintf(fOut, "%s\n", macCode);
         }
@@ -108,5 +125,3 @@ int main(int argc, char const *argv[]) {
     }
     return 0;
 }
-
-
